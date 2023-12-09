@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Properties;
 
 /**
  * @author changbao.li Date: 2019-10-01 Time: 17:39
@@ -16,7 +17,8 @@ public class TestJDBC {
      *  * which currently load JDBC drivers using <code>Class.forName()</code> will continue to work without
      *  * modification.
      *
-     * @see DriverManager
+     * @see DriverManager#getConnection(String, Properties, Class)
+     * @see DriverManager#ensureDriversInitialized()
      *
      * 无须手动加载驱动了！！
      */
