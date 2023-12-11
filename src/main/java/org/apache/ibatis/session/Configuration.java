@@ -730,9 +730,11 @@ public class Configuration {
     } else {
       executor = new SimpleExecutor(this, transaction);
     }
+
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+
     return (Executor) interceptorChain.pluginAll(executor);
   }
 

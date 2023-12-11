@@ -31,12 +31,17 @@ import java.util.Set;
 
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.Configuration;
 
 /**
  * @author Clinton Begin
  */
 public class TypeAliasRegistry {
 
+  /**
+   * typeAliases 重要内容添加内容
+   * @see Configuration#Configuration()
+   */
   private final Map<String, Class<?>> typeAliases = new HashMap<>();
 
   public TypeAliasRegistry() {

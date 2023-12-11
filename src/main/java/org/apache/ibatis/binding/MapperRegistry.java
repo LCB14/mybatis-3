@@ -46,6 +46,7 @@ public class MapperRegistry {
     if (mapperProxyFactory == null) {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
     }
+
     try {
       return mapperProxyFactory.newInstance(sqlSession);
     } catch (Exception e) {
