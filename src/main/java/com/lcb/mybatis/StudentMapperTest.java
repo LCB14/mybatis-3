@@ -50,11 +50,18 @@ public class StudentMapperTest {
       sqlSession = sqlSessionFactory.openSession();
 
       /**
+       * 方式1
+       * @see DefaultSqlSession#selectList(String)
+       */
+      List<Object> objects = sqlSession.selectList("com.lcb.mapper.StudentMapper.selectAll");
+      System.out.println(objects);
+
+      /**
+       * 方式2
        * 通过session对象来获取mapper
        * @see DefaultSqlSession#getMapper(Class)
        */
       StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
-
       /**
        * @see MapperProxy#invoke(Object, Method, Object[])
        */

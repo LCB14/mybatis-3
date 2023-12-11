@@ -28,6 +28,7 @@ import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.exceptions.ExceptionFactory;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.apache.ibatis.executor.BatchResult;
+import org.apache.ibatis.executor.CachingExecutor;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.result.DefaultMapResultHandler;
@@ -149,8 +150,20 @@ public class DefaultSqlSession implements SqlSession {
 
   private <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds, ResultHandler handler) {
     try {
+      /**
+       * 根据 statement （namespace + id）获取对应的 mapper 信息
+       * <mapper namespace="com.lcb.mapper.StudentMapper">
+       *   <select id="selectAll" resultType="com.lcb.beans.Student">
+       *     select * from student
+       *   </select>
+       * </mapper>
+       */
       MappedStatement ms = configuration.getMappedStatement(statement);
       dirty |= ms.isDirtySelect();
+
+      /**
+       * @see CachingExecutor#query(MappedStatement, Object, RowBounds, ResultHandler)
+       */
       return executor.query(ms, wrapCollection(parameter), rowBounds, handler);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);

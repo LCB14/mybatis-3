@@ -57,6 +57,10 @@ public class RoutingStatementHandler implements StatementHandler {
 
   @Override
   public Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException {
+    /**
+     * prepare 方法在 PreparedStatementHandler 的父类
+     * @see BaseStatementHandler#prepare(Connection, Integer)
+     */
     return delegate.prepare(connection, transactionTimeout);
   }
 
@@ -77,6 +81,9 @@ public class RoutingStatementHandler implements StatementHandler {
 
   @Override
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
+    /**
+     * @see PreparedStatementHandler#query(Statement, ResultHandler)
+     */
     return delegate.query(statement, resultHandler);
   }
 

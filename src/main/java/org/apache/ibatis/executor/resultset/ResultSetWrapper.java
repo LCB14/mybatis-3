@@ -53,7 +53,9 @@ public class ResultSetWrapper {
   public ResultSetWrapper(ResultSet rs, Configuration configuration) throws SQLException {
     this.typeHandlerRegistry = configuration.getTypeHandlerRegistry();
     this.resultSet = rs;
+
     final ResultSetMetaData metaData = rs.getMetaData();
+
     final int columnCount = metaData.getColumnCount();
     for (int i = 1; i <= columnCount; i++) {
       columnNames.add(configuration.isUseColumnLabel() ? metaData.getColumnLabel(i) : metaData.getColumnName(i));

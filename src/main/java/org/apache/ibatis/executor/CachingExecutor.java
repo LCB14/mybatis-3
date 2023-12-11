@@ -107,6 +107,11 @@ public class CachingExecutor implements Executor {
         return list;
       }
     }
+    /**
+     * delegate 对应的是 SimpleExecutor 实例，query为其父类 BaseExecutor 的方法
+     * @see SimpleExecutor
+     * @see org.apache.ibatis.executor.BaseExecutor#query(org.apache.ibatis.mapping.MappedStatement, java.lang.Object, org.apache.ibatis.session.RowBounds, org.apache.ibatis.session.ResultHandler, org.apache.ibatis.cache.CacheKey, org.apache.ibatis.mapping.BoundSql)
+     */
     return delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
   }
 
