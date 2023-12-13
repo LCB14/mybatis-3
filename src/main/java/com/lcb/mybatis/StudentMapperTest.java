@@ -57,7 +57,7 @@ public class StudentMapperTest {
       System.out.println(objects);
 
       /**
-       * 方式2
+       * 方式2(本质还是基于"方式1"的底层实现方法)
        * 通过session对象来获取mapper
        * @see DefaultSqlSession#getMapper(Class)
        */
