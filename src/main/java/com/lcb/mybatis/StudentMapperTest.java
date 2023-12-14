@@ -22,9 +22,10 @@ public class StudentMapperTest {
   static {
     Reader reader = null;
     try {
-      // 通过MyBatis自带的Resources工具来加载配置文件
+      // 通过类加载器对配置文件进行加载，获取文件对应的字节流。
       reader = Resources.getResourceAsReader("mybatis-config.xml");
-      // 通过SqlSessionFactoryBuilder()来构建sqlSessionFactory对象
+
+      // 解析mybatis配置文件，把配置文件转换为Configuration对象然后将其作为DefaultSqlSessionFactory类的构造函数参数，创建DefaultSqlSessionFactory对象
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
     } catch (IOException e) {
       e.printStackTrace();

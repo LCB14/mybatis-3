@@ -96,6 +96,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // 判断是否已经解析过了
     if (!configuration.isResourceLoaded(resource)) {
       configurationElement(parser.evalNode("/mapper"));
       configuration.addLoadedResource(resource);

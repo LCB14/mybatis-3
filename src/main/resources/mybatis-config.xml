@@ -16,7 +16,7 @@
   </environments>
 
   <mappers>
-    <!--加载mapper的方式：resource、url、class、name -->
+    <!--加载mapper的方式：package、resource、url、class -->
     <mapper resource="mybatis/StudentMapper.xml"/>
   </mappers>
 </configuration>

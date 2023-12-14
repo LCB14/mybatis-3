@@ -18,6 +18,7 @@ package org.apache.ibatis.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.util.MapUtil;
 
 /**
@@ -61,9 +62,14 @@ public class LanguageDriverRegistry {
   }
 
   public Class<? extends LanguageDriver> getDefaultDriverClass() {
+    // 默认值 XMLLanguageDriver.class
     return defaultDriverClass;
   }
 
+  /**
+   * 调用位置参考
+   * @see Configuration#Configuration() -- 216行
+   */
   public void setDefaultDriverClass(Class<? extends LanguageDriver> defaultDriverClass) {
     register(defaultDriverClass);
     this.defaultDriverClass = defaultDriverClass;

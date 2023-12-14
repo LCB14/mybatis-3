@@ -44,6 +44,14 @@ public class SqlSessionFactoryBuilder {
     return build(reader, null, properties);
   }
 
+  /**
+   * environment 参数值对应下面xml配置节点:
+   * <environments default="development">
+   *   <environment id="development">
+   *     ...
+   *   </environment>
+   * </environments>
+   */
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);

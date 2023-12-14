@@ -15,6 +15,8 @@
  */
 package org.apache.ibatis.parsing;
 
+import org.apache.ibatis.builder.SqlSourceBuilder;
+
 /**
  * @author Clinton Begin
  */
@@ -73,6 +75,9 @@ public class GenericTokenParser {
           builder.append(src, start, src.length - start);
           offset = src.length;
         } else {
+          /**
+           * @see SqlSourceBuilder.ParameterMappingTokenHandler#handleToken(String)
+           */
           builder.append(handler.handleToken(expression.toString()));
           offset = end + closeToken.length();
         }

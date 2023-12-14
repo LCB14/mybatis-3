@@ -36,7 +36,7 @@ public class TestJDBC {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            // 2、创建连接
+            // 2、创建连接（这里已经帮实现 步骤1 的加载驱动了）
             connection = DriverManager
                     .getConnection("jdbc:mysql://127.0.0.1:3306/test_db?useSSL=false&characterEncoding=utf-8", "root",
                             "li123456");
