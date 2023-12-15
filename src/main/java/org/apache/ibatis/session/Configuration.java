@@ -726,17 +726,22 @@ public class Configuration {
     executorType = executorType == null ? defaultExecutorType : executorType;
     Executor executor;
     if (ExecutorType.BATCH == executorType) {
+      // 批量执行器，基于jdbc的addBatch、executeBatch功能，并且在当前SQL和上一条SQL完全一样的时候，重用statement，在调用doFlushStatements的时候，将数据刷新到数据库。
       executor = new BatchExecutor(this, transaction);
     } else if (ExecutorType.REUSE == executorType) {
+      // 重用执行器，相较于SimpleExecutor 多了statement缓存功能，其内部维护一个Map<String,Statement>，每次编译完成statement都会缓存，不会关闭。
       executor = new ReuseExecutor(this, transaction);
     } else {
+      // 简单执行器，每执行一条SQL，都会创建一个statement，执行完成后关闭
       executor = new SimpleExecutor(this, transaction);
     }
 
     if (cacheEnabled) {
+      // 采用装饰器模式，在开启缓存的情况下（默认开启），会对上面三种执行器进行包装
       executor = new CachingExecutor(executor);
     }
 
+    // 拦截器插件
     return (Executor) interceptorChain.pluginAll(executor);
   }
 

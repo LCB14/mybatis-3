@@ -83,30 +83,47 @@ public class CachingExecutor implements Executor {
   }
 
   @Override
-  public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler)
-      throws SQLException {
+  public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
     BoundSql boundSql = ms.getBoundSql(parameterObject);
+
+    /**
+     * 生成本地缓存对应的key，思考？
+     * 1、CacheKey 对象是有哪几部分组成？
+     * 2、CacheKey 对象如何保证唯一性？
+     *
+     * ms：解析的<mapper>标签信息
+     * parameterObject：方法参数值
+     * rowBounds：分页参数
+     * boundSql：<mapper>标签中指定的经过替换#{}符合的sql信息
+     */
     CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
+
     return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
   }
 
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler,
       CacheKey key, BoundSql boundSql) throws SQLException {
+    // 获取二级缓存（对应<mapper>标签下的子标签<cache>配置的内容）-- 因此二级缓存需要手动开启
     Cache cache = ms.getCache();
     if (cache != null) {
+      // 刷新二级缓存（存在缓存且<mapper flushCache="true"/>）
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
         ensureNoOutParams(ms, boundSql);
+
+        // 从二级缓存中查询数据
         @SuppressWarnings("unchecked")
         List<E> list = (List<E>) tcm.getObject(cache, key);
         if (list == null) {
           list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+          // 注意此处只是存到map集合中，并没有真正存到二级缓存中
           tcm.putObject(cache, key, list); // issue #578 and #116
         }
         return list;
       }
     }
+
     /**
      * delegate 对应的是 SimpleExecutor 实例，query为其父类 BaseExecutor 的方法
      * @see SimpleExecutor
@@ -151,6 +168,9 @@ public class CachingExecutor implements Executor {
 
   @Override
   public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
+    /**
+     * @see BaseExecutor#createCacheKey(MappedStatement, Object, RowBounds, BoundSql)
+     */
     return delegate.createCacheKey(ms, parameterObject, rowBounds, boundSql);
   }
 

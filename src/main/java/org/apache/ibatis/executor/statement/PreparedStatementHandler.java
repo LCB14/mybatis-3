@@ -30,6 +30,7 @@ import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultSetType;
+import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
@@ -65,6 +66,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     PreparedStatement ps = (PreparedStatement) statement;
     ps.execute();
     /**
+     * 结果集处理
      * @see DefaultResultSetHandler#handleResultSets(Statement)
      */
     return resultSetHandler.handleResultSets(ps);
@@ -79,7 +81,9 @@ public class PreparedStatementHandler extends BaseStatementHandler {
 
   @Override
   protected Statement instantiateStatement(Connection connection) throws SQLException {
+    // 获取用户自定义sql语句
     String sql = boundSql.getSql();
+
     if (mappedStatement.getKeyGenerator() instanceof Jdbc3KeyGenerator) {
       String[] keyColumnNames = mappedStatement.getKeyColumns();
       if (keyColumnNames == null) {
@@ -90,6 +94,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     }
 
     if (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) {
+      // jdbc 经典方法
       return connection.prepareStatement(sql);
     } else {
       return connection.prepareStatement(sql, mappedStatement.getResultSetType().getValue(),
@@ -99,6 +104,9 @@ public class PreparedStatementHandler extends BaseStatementHandler {
 
   @Override
   public void parameterize(Statement statement) throws SQLException {
+    /**
+     * @see DefaultParameterHandler#setParameters(PreparedStatement)
+     */
     parameterHandler.setParameters((PreparedStatement) statement);
   }
 

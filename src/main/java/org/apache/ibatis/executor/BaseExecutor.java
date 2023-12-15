@@ -145,6 +145,7 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // 如果配置了flushCacheRequired为true，则会在执行器执行之前就清空本地一级缓存
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
       clearLocalCache();
     }
@@ -152,11 +153,13 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     try {
       queryStack++;
+
+      // 从一级缓存查询数据
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
-        // 查询数据库
+        // 缓存没有查到数据，查询数据库
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -202,10 +205,18 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+
+    // 创建缓存key
     CacheKey cacheKey = new CacheKey();
+
+    // ms.getId() 等价于 <mapper namespace="xxx"> + <select id="xxx">
     cacheKey.update(ms.getId());
+
+    // 分页参数
     cacheKey.update(rowBounds.getOffset());
     cacheKey.update(rowBounds.getLimit());
+
+    // 执行sql
     cacheKey.update(boundSql.getSql());
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();
@@ -227,11 +238,13 @@ public abstract class BaseExecutor implements Executor {
           }
           value = metaObject.getValue(propertyName);
         }
+        // 参数值计算
         cacheKey.update(value);
       }
     }
     if (configuration.getEnvironment() != null) {
       // issue #176
+      // 当前环境的值也会参与计算
       cacheKey.update(configuration.getEnvironment().getId());
     }
     return cacheKey;

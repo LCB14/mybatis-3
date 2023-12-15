@@ -56,9 +56,16 @@ public class CacheKey implements Cloneable, Serializable {
   private List<Object> updateList;
 
   public CacheKey() {
+    // cacheKey 的hash值，在update函数中实时算出来
     this.hashcode = DEFAULT_HASHCODE;
+
+    // 参与hash运算的乘数
     this.multiplier = DEFAULT_MULTIPLIER;
+
+    // updateList 集合中的元素个数
     this.count = 0;
+
+    // 根据该集合中的元素判断两个cacheKey是否相同
     this.updateList = new ArrayList<>();
   }
 

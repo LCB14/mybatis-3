@@ -63,11 +63,12 @@ public class SimpleExecutor extends BaseExecutor {
       Configuration configuration = ms.getConfiguration();
 
       /**
-       * 返回包装类
+       * 返回包装类 RoutingStatementHandler
        * @see RoutingStatementHandler#RoutingStatementHandler(Executor, MappedStatement, Object, RowBounds, ResultHandler, BoundSql)
        */
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
 
+      // 利用 connect 创建 PreparedStatement 对象
       stmt = prepareStatement(handler, ms.getStatementLog());
 
       /**
@@ -98,11 +99,19 @@ public class SimpleExecutor extends BaseExecutor {
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     Connection connection = getConnection(statementLog);
+
     /**
+     * 创建 Statement 对象
      * @see RoutingStatementHandler#prepare(Connection, Integer)
      */
     stmt = handler.prepare(connection, transaction.getTimeout());
+
+    /**
+     * sql 语句参数设置
+     * @see org.apache.ibatis.executor.statement.PreparedStatementHandler#parameterize(java.sql.Statement)
+     */
     handler.parameterize(stmt);
+
     return stmt;
   }
 

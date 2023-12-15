@@ -46,6 +46,7 @@ public class StudentMapperTest {
     SqlSession sqlSession = null;
     try {
       /**
+       * 创建事务对象、执行器对象、添加拦截器插件
        * @see DefaultSqlSessionFactory#openSession()
        */
       sqlSession = sqlSessionFactory.openSession();

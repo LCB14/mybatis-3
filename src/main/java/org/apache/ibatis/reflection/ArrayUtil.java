@@ -35,14 +35,17 @@ public class ArrayUtil {
       // for consistency with Arrays#hashCode() and Objects#hashCode()
       return 0;
     }
+
     final Class<?> clazz = obj.getClass();
     if (!clazz.isArray()) {
       return obj.hashCode();
     }
+
     final Class<?> componentType = clazz.getComponentType();
     if (long.class.equals(componentType)) {
       return Arrays.hashCode((long[]) obj);
     }
+
     if (int.class.equals(componentType)) {
       return Arrays.hashCode((int[]) obj);
     } else if (short.class.equals(componentType)) {

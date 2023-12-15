@@ -140,11 +140,13 @@ public class DefaultSqlSession implements SqlSession {
 
   @Override
   public <E> List<E> selectList(String statement, Object parameter) {
+    // RowBounds.DEFAULT 为分页参数，用于mybatis自带的分页功能
     return this.selectList(statement, parameter, RowBounds.DEFAULT);
   }
 
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
+    // ResultHandler handler 参数表示结果集处理对象，这里传的是 null。
     return selectList(statement, parameter, rowBounds, Executor.NO_RESULT_HANDLER);
   }
 

@@ -95,10 +95,12 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     try {
       final Environment environment = configuration.getEnvironment();
 
+      // 获得事务工厂对象
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
 
       /**
+       * 创建执行器对象
        * 默认使用的执行器参考
        * @see SimpleExecutor#SimpleExecutor(Configuration, Transaction)
        *
