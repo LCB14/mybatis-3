@@ -278,12 +278,12 @@
       <version>42.7.0</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>8.2.0</version>
-      <scope>test</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.mysql</groupId>-->
+<!--      <artifactId>mysql-connector-j</artifactId>-->
+<!--      <version>8.2.0</version>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>

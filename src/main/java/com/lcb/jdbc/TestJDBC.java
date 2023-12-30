@@ -18,7 +18,7 @@ public class TestJDBC {
      *  * modification.
      *
      * @see DriverManager#getConnection(String, Properties, Class)
-     * @see DriverManager#ensureDriversInitialized()
+     * @see java.sql.DriverManager#loadInitialDrivers
      *
      * 无须手动加载驱动了！！
      */
