@@ -52,14 +52,14 @@ public class StudentMapperTest {
       sqlSession = sqlSessionFactory.openSession();
 
       /**
-       * 方式1
+       * 方式1（基于Statement ID）
        * @see DefaultSqlSession#selectList(String)
        */
       List<Object> objects = sqlSession.selectList("com.lcb.mapper.StudentMapper.selectAll");
       System.out.println(objects);
 
       /**
-       * 方式2(本质还是基于"方式1"的底层实现方法)
+       * 方式2(基于Mapper接口，本质还是基于"方式1"的底层实现方法)
        * 通过session对象来获取mapper
        * @see DefaultSqlSession#getMapper(Class)
        */
