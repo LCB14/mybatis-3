@@ -32,7 +32,9 @@ class PooledConnection implements InvocationHandler {
   private static final Class<?>[] IFACES = { Connection.class };
 
   private final int hashCode;
+
   private final PooledDataSource dataSource;
+
   private final Connection realConnection;
   private final Connection proxyConnection;
 
