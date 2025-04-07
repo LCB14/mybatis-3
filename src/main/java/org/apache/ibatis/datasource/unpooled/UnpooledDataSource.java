@@ -224,9 +224,14 @@ public class UnpooledDataSource implements DataSource {
   }
 
   private Connection doGetConnection(Properties properties) throws SQLException {
+    // 初始化驱动
     initializeDriver();
+
     Connection connection = DriverManager.getConnection(url, properties);
+
     configureConnection(connection);
+
+    // 没对 connection 做任何缓存，即每次获取连接时，都会重新创建一个连接。
     return connection;
   }
 
@@ -239,10 +244,17 @@ public class UnpooledDataSource implements DataSource {
         } else {
           driverType = Resources.classForName(driver);
         }
+
         // DriverManager requires the driver to be loaded via the system ClassLoader.
         // https://www.kfu.com/~nsayer/Java/dyn-jdbc.html
         Driver driverInstance = (Driver) driverType.getDeclaredConstructor().newInstance();
+
+        /*
+         * 注册驱动，注意这里是将 Driver 代理类 DriverProxy 对象注册到 DriverManager 中的，
+         * 而非 Driver 对象本身。DriverProxy 中并没什么特别的逻辑。
+         */
         DriverManager.registerDriver(new DriverProxy(driverInstance));
+
         registeredDrivers.put(driver, driverInstance);
       } catch (Exception e) {
         throw new SQLException("Error setting driver on UnpooledDataSource. Cause: " + e);

@@ -17,6 +17,7 @@ package org.apache.ibatis.datasource.pooled;
 
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -44,6 +45,9 @@ public class PooledDataSource implements DataSource {
 
   private static final Log log = LogFactory.getLog(PooledDataSource.class);
 
+  /**
+   * 用于记录连接池运行时的状态，比如连接获取次数，无效连接数量等。同时 PoolState 内部定义了两个 PooledConnection 集合，用于存储空闲连接和活跃连接。
+   */
   private final PoolState state = new PoolState(this);
 
   private final UnpooledDataSource dataSource;
@@ -388,6 +392,14 @@ public class PooledDataSource implements DataSource {
     return ("" + url + username + password).hashCode();
   }
 
+  /**
+   * 1、首先将连接从活跃连接集合中移除，然后再根据空闲集合是否有空闲空间进行后续处理。
+   * 2、如果空闲集合未满，此时复用原连接的字段信息创建新的连接，并将其放入空闲集合中即可。
+   * 3、若空闲集合已满，此时无需回收连接，直接关闭即可。
+   *
+   * 调用位置
+   * @see PooledConnection#invoke(Object, Method, Object[])
+   */
   protected void pushConnection(PooledConnection conn) throws SQLException {
 
     lock.lock();
@@ -432,6 +444,26 @@ public class PooledDataSource implements DataSource {
     }
   }
 
+  /**
+   * if (连接池中有空闲连接) {
+   *     1. 将连接从空闲连接集合中移除
+   * } else {
+   *     if (活跃连接数未超出限制) {
+   *         1. 创建新连接
+   *     } else {
+   *         1. 从活跃连接集合中取出第一个元素
+   *         2. 获取连接运行时长
+   *
+   *         if (连接超时) {
+   *             1. 将连接从活跃集合中移除
+   *             2. 复用原连接的成员变量，并创建新的 PooledConnection 对象
+   *         } else {
+   *             1. 线程进入等待状态
+   *             2. 线程被唤醒后，重新执行以上逻辑
+   *         }
+   *     }
+   * }
+   */
   private PooledConnection popConnection(String username, String password) throws SQLException {
     boolean countedWait = false;
     PooledConnection conn = null;
@@ -463,6 +495,8 @@ public class PooledDataSource implements DataSource {
             state.accumulatedCheckoutTimeOfOverdueConnections += longestCheckoutTime;
             state.accumulatedCheckoutTime += longestCheckoutTime;
             state.activeConnections.remove(oldestActiveConnection);
+
+            // 若连接未设置自动提交，此处进行回滚操作
             if (!oldestActiveConnection.getRealConnection().getAutoCommit()) {
               try {
                 oldestActiveConnection.getRealConnection().rollback();
@@ -476,9 +510,16 @@ public class PooledDataSource implements DataSource {
                 log.debug("Bad connection. Could not roll back");
               }
             }
+
+            /**
+             * 创建一个新的 PooledConnection，注意，
+             * 此处复用 oldestActiveConnection 的 realConnection 变量
+             */
             conn = new PooledConnection(oldestActiveConnection.getRealConnection(), this);
             conn.setCreatedTimestamp(oldestActiveConnection.getCreatedTimestamp());
             conn.setLastUsedTimestamp(oldestActiveConnection.getLastUsedTimestamp());
+
+            // 老连接设置为无效状态
             oldestActiveConnection.invalidate();
             if (log.isDebugEnabled()) {
               log.debug("Claimed overdue connection " + conn.getRealHashCode() + ".");
@@ -505,6 +546,8 @@ public class PooledDataSource implements DataSource {
             }
           }
         }
+
+
         if (conn != null) {
           // ping to server and check the connection is valid or not
           if (conn.isValid()) {
@@ -514,6 +557,7 @@ public class PooledDataSource implements DataSource {
             conn.setConnectionTypeCode(assembleConnectionTypeCode(dataSource.getUrl(), username, password));
             conn.setCheckoutTimestamp(System.currentTimeMillis());
             conn.setLastUsedTimestamp(System.currentTimeMillis());
+
             state.activeConnections.add(conn);
             state.requestCount++;
             state.accumulatedRequestTime += System.currentTimeMillis() - t;

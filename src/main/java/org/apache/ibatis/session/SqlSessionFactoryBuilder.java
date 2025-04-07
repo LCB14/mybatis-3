@@ -54,6 +54,11 @@ public class SqlSessionFactoryBuilder {
    */
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
+      /**
+       * 1、首先实例化一个XMLConfigBuilder；
+       * 2、然后调用XMLConfigBuilder的parse方法得到Configuration对象；
+       * 3、最后将Configuration对象作为参数实例化一个DefaultSqlSessionFactory 即SqlSessionFactory对象。
+       */
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
       return build(parser.parse());
     } catch (Exception e) {

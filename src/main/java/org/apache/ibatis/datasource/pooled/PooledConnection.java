@@ -35,9 +35,14 @@ class PooledConnection implements InvocationHandler {
   private final PooledDataSource dataSource;
   private final Connection realConnection;
   private final Connection proxyConnection;
+
+  // 从连接池中取出连接时的时间戳
   private long checkoutTimestamp;
+  // 数据库连接创建时间
   private long createdTimestamp;
+  // 数据库连接最后使用时间
   private long lastUsedTimestamp;
+
   private int connectionTypeCode;
   private boolean valid;
 
@@ -245,7 +250,9 @@ class PooledConnection implements InvocationHandler {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     String methodName = method.getName();
+    // 检测 close 方法是否被调用，若被调用则拦截之
     if (CLOSE.equals(methodName)) {
+      // 将回收连接中，而不是直接将连接关闭
       dataSource.pushConnection(this);
       return null;
     }
@@ -255,6 +262,7 @@ class PooledConnection implements InvocationHandler {
         // throw an SQLException instead of a Runtime
         checkConnection();
       }
+      // 调用真实连接的目标方法
       return method.invoke(realConnection, args);
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);
