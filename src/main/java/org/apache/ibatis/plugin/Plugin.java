@@ -64,14 +64,26 @@ public class Plugin implements InvocationHandler {
     }
   }
 
+  /**
+   *  示例参考：
+   *    @Intercepts({@Signature(type = Executor.class, method = "query", args = {
+   *    MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
+   *    // @Intercepts({@Signature( type= StatementHandler.class,  method = "update", args ={Statement.class})})
+   *    public class ExamplePlugin implements Interceptor {
+   *     ...
+   *    }
+   */
   private static Map<Class<?>, Set<Method>> getSignatureMap(Interceptor interceptor) {
     Intercepts interceptsAnnotation = interceptor.getClass().getAnnotation(Intercepts.class);
+
     // issue #251
     if (interceptsAnnotation == null) {
       throw new PluginException(
           "No @Intercepts annotation was found in interceptor " + interceptor.getClass().getName());
     }
+
     Signature[] sigs = interceptsAnnotation.value();
+
     Map<Class<?>, Set<Method>> signatureMap = new HashMap<>();
     for (Signature sig : sigs) {
       Set<Method> methods = MapUtil.computeIfAbsent(signatureMap, sig.type(), k -> new HashSet<>());
