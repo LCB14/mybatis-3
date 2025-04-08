@@ -80,6 +80,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
+      // 如果方法是定义在 Object 类中的，则直接调用
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
       }
@@ -93,9 +94,12 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
     try {
       return MapUtil.computeIfAbsent(methodCache, method, m -> {
+        // 用于支持 JDK 1.8 中的新特性 - 默认方法。
         if (!m.isDefault()) {
+          // 主要执行下面这段代码
           return new PlainMethodInvoker(new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
         }
+
         try {
           if (privateLookupInMethod == null) {
             return new DefaultMethodInvoker(getMethodHandleJava8(method));
