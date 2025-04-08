@@ -102,6 +102,10 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     }
   }
 
+  /**
+   * 调用位置参考
+   * @see org.apache.ibatis.executor.SimpleExecutor#prepareStatement(org.apache.ibatis.executor.statement.StatementHandler, org.apache.ibatis.logging.Log)
+   */
   @Override
   public void parameterize(Statement statement) throws SQLException {
     /**
