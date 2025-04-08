@@ -109,6 +109,7 @@ public class CachingExecutor implements Executor {
     if (cache != null) {
       // 刷新二级缓存（存在缓存且<mapper flushCache="true"/>）
       flushCacheIfRequired(ms);
+
       if (ms.isUseCache() && resultHandler == null) {
         ensureNoOutParams(ms, boundSql);
 
@@ -116,7 +117,12 @@ public class CachingExecutor implements Executor {
         @SuppressWarnings("unchecked")
         List<E> list = (List<E>) tcm.getObject(cache, key);
         if (list == null) {
+          /**
+           * @see SimpleExecutor
+           * @see BaseExecutor#query(MappedStatement, Object, RowBounds, ResultHandler, CacheKey, BoundSql)
+           */
           list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+
           // 注意此处只是存到map集合中，并没有真正存到二级缓存中
           tcm.putObject(cache, key, list); // issue #578 and #116
         }

@@ -38,8 +38,12 @@ public class DynamicContext {
     OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());
   }
 
+  // 存储一些额外的信息，比如运行时参数 和 databaseId 等
   private final ContextMap bindings;
+
+  // 用于存放 SQL 片段的解析结果
   private final StringJoiner sqlBuilder = new StringJoiner(" ");
+
   private int uniqueNumber;
 
   public DynamicContext(Configuration configuration, Object parameterObject) {

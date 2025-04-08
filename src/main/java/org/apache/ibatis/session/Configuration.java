@@ -715,6 +715,7 @@ public class Configuration {
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject,
         rowBounds, resultHandler, boundSql);
 
+    // 应用插件到 StatementHandler 上
     return (StatementHandler) interceptorChain.pluginAll(statementHandler);
   }
 
