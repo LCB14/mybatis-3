@@ -31,7 +31,10 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
+
+import javax.sql.DataSource;
 
 /**
  * @author Clinton Begin
@@ -95,7 +98,10 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     try {
       final Environment environment = configuration.getEnvironment();
 
-      // 获得事务工厂对象
+      /**
+       * 获得事务工厂对象
+       * @see JdbcTransactionFactory#newTransaction(DataSource, TransactionIsolationLevel, boolean)
+       */
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
 

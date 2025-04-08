@@ -28,6 +28,10 @@ public class InterceptorChain {
 
   public Object pluginAll(Object target) {
     for (Interceptor interceptor : interceptors) {
+      /**
+       * @see Interceptor#plugin(Object)
+       * @see org.apache.ibatis.plugin.Plugin#wrap(java.lang.Object, org.apache.ibatis.plugin.Interceptor)
+       */
       target = interceptor.plugin(target);
     }
     return target;
