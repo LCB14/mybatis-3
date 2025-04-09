@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.cache.decorators;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -50,6 +51,13 @@ public class LruCache implements Cache {
     keyMap = new LinkedHashMap<Object, Object>(size, .75F, true) {
       private static final long serialVersionUID = 4267176411845948333L;
 
+      /**
+       * 在 LinkedHashMap 的底层实现中，插入新条目后会调用一个内部方法（如 afterNodeInsertion()），
+       * 该方法进一步调用 removeEldestEntry() 来决定是否删除最旧的条目。
+       * @see HashMap#put(Object, Object)
+       * @see HashMap#putVal(int, Object, Object, boolean, boolean)
+       * @see LinkedHashMap#afterNodeInsertion(boolean)
+       */
       @Override
       protected boolean removeEldestEntry(Map.Entry<Object, Object> eldest) {
         boolean tooBig = size() > size;

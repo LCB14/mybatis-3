@@ -95,6 +95,7 @@ public class BlockingCache implements Cache {
       }
       try {
         if (timeout > 0) {
+          // true 表示计数成功归零，false 表示在预设等待时间内未能等到计数归零
           boolean acquired = latch.await(timeout, TimeUnit.MILLISECONDS);
           if (!acquired) {
             throw new CacheException(
