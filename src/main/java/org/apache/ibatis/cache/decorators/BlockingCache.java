@@ -71,6 +71,8 @@ public class BlockingCache implements Cache {
     acquireLock(key);
     Object value = delegate.getObject(key);
     // 若缓存命中，则释放锁。需要注意的是，未命中则不释放锁
+    // 当指定 key 对应元素不存在于缓存中时，BlockingCache 会根据 lock 进行加锁。
+    // 此时，其他线程将会进入等待状态，直到与 key 对应的元素被填充到缓存中。而不是让所有线程都去访问数据库。
     if (value != null) {
       // 释放锁
       releaseLock(key);
