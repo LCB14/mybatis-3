@@ -60,15 +60,19 @@ public class BlockingCache implements Cache {
     try {
       delegate.putObject(key, value);
     } finally {
+      // 这里之所以要操作锁释放，因为查询缓存时，没有查找到元素锁是不会释放的。
       releaseLock(key);
     }
   }
 
   @Override
   public Object getObject(Object key) {
+    // 获取锁
     acquireLock(key);
     Object value = delegate.getObject(key);
+    // 若缓存命中，则释放锁。需要注意的是，未命中则不释放锁
     if (value != null) {
+      // 释放锁
       releaseLock(key);
     }
     return value;
@@ -89,11 +93,13 @@ public class BlockingCache implements Cache {
   private void acquireLock(Object key) {
     CountDownLatch newLatch = new CountDownLatch(1);
     while (true) {
+      // 类比redis实现的分布式，添加键值对 ，能添加就表示获取锁
       CountDownLatch latch = locks.putIfAbsent(key, newLatch);
       if (latch == null) {
         break;
       }
       try {
+        // 说明已经有线程捷足先登了，这里等待已获取线程的锁释放
         if (timeout > 0) {
           // true 表示计数成功归零，false 表示在预设等待时间内未能等到计数归零
           boolean acquired = latch.await(timeout, TimeUnit.MILLISECONDS);
@@ -111,6 +117,7 @@ public class BlockingCache implements Cache {
   }
 
   private void releaseLock(Object key) {
+    // 删除key,表示锁释放
     CountDownLatch latch = locks.remove(key);
     if (latch == null) {
       throw new IllegalStateException("Detected an attempt at releasing unacquired lock. This should never happen.");
