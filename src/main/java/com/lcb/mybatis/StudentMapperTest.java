@@ -41,6 +41,10 @@ public class StudentMapperTest {
   }
 
 
+  /**
+   * 源码阅读参考
+   * <link https://blog.csdn.net/qq_35512802/article/details/127592740 />
+   */
   public static void main(String[] args) {
     // 打开一个session对象
     SqlSession sqlSession = null;
