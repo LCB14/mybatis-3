@@ -46,6 +46,8 @@ public class TestJDBC {
 
             // 4、执行SQL
             resultSet = preparedStatement.executeQuery();
+
+            // 5、处理结果集
             while (resultSet.next()) {
                 String columnName1 = resultSet.getMetaData().getColumnName(1);
                 String columnName2 = resultSet.getMetaData().getColumnName(2);
