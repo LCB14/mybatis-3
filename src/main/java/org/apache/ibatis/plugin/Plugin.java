@@ -86,6 +86,7 @@ public class Plugin implements InvocationHandler {
 
     Map<Class<?>, Set<Method>> signatureMap = new HashMap<>();
     for (Signature sig : sigs) {
+      // 这里之所以是集合，因为用户可能指定拦截同一类型中的多个方法
       Set<Method> methods = MapUtil.computeIfAbsent(signatureMap, sig.type(), k -> new HashSet<>());
       try {
         Method method = sig.type().getMethod(sig.method(), sig.args());
